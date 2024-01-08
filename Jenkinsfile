@@ -19,16 +19,7 @@ pipeline {
 
        
 
-        stage('./backend') {
-           
-            steps {
-                dir('./backend') {
-                    sh 'docker build -t $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID .'
-                    sh 'docker push $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
-                    sh 'docker rmi $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
-                }
-            }
-        }
+        
 stage('./frontend') {
            
             steps {
