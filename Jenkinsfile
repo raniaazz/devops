@@ -19,17 +19,26 @@ pipeline {
 
        
 
-        stage('Build proj') {
+        stage('./backend') {
            
             steps {
-                dir('client') {
+                dir('./backend') {
                     sh 'docker build -t $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID .'
                     sh 'docker push $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
                     sh 'docker rmi $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
                 }
             }
         }
-
+stage('./frontend') {
+           
+            steps {
+                dir('./frontend') {
+                    sh 'docker build -t $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID .'
+                    sh 'docker push $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
+                    sh 'docker rmi $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
+                }
+            }
+        }
         stage('logout') {
             steps {
                 sh 'docker logout'
