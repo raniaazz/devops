@@ -1,43 +1,38 @@
-echo 'Building and Pushing Docker Image'
 pipeline {
-    agent any  
-
+    agent any
     environment {
-        DOCKERHUB_CREDENTIAL_ID = '51'
+        DOCKERHUB_CREDENTIALS = credentials('dh_cred')
     }
-
     stages {
-        stage('Build and Push Image') {
+        stage('Checkout') {
             steps {
-                script {
-                    echo 'Building and Pushing Docker Image'
-                   
-                    dir('front') {
-                        sh 'docker build -t alaaeddinedorai/devops:latest .'
+                checkout scm
+            }
+        }
 
-                        withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIAL_ID, usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                            sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
-                        }
+        stage('Init') {
+            steps {
+                sh 'echo Init Step'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
 
-                        sh 'docker push alaaeddinedorai/devops:latest'        
-                    }
+       
+
+        stage('Build proj') {
+           
+            steps {
+                dir('client') {
+                    sh 'docker build -t $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID .'
+                    sh 'docker push $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
+                    sh 'docker rmi $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
                 }
             }
         }
 
-        stage('Testing') {
+        stage('logout') {
             steps {
-                script {
-                    sh 'npm test'
-                }
-            }
-        }
-
-        stage('Cleanup') {
-            steps {
-                script {
-                    sh 'rm -rf temporary_files'
-                }
+                sh 'docker logout'
             }
         }
     }
