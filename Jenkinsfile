@@ -8,28 +8,26 @@ pipeline {
 
     stages {
         stage('Build and Push Image') {
-    steps {
-        script {
-            echo 'Building and Pushing Docker Image'
-           
-            dir('front') {
-                sh 'docker build -t raniaazz/devops:latest .'
+            steps {
+                script {
+                    echo 'Building and Pushing Docker Image'
+                   
+                    dir('front') {
+                        sh 'docker build -t alaaeddinedorai/devops:latest .'
 
-                withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIAL_ID, usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                    sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
+                        withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIAL_ID, usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                            sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
+                        }
+
+                        sh 'docker push alaaeddinedorai/devops:latest'        
+                    }
                 }
-
-                sh 'docker push raniaazz/devops:latest'        
             }
         }
-    }
-}
-
 
         stage('Testing') {
             steps {
                 script {
-                   
                     sh 'npm test'
                 }
             }
