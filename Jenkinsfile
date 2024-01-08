@@ -17,19 +17,25 @@ pipeline {
             }
         }
 
-       
-
-        
-stage('./frontend') {
-           
+        stage('Build and Push Docker Image') {
             steps {
-                dir('./frontend') {
-                    sh 'docker build -t $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID .'
-                    sh 'docker push $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
-                    sh 'docker rmi $DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID'
+                script {
+                    // Define the Docker image name with a tag
+                    def dockerImageName = "$DOCKERHUB_CREDENTIALS_USR/client:$BUILD_ID"
+                    
+                    // Navigate to the frontend directory
+                    dir('./frontend') {
+                        // Build and push Docker image
+                        sh "docker build -t $dockerImageName ."
+                        sh "docker push $dockerImageName"
+                    }
+
+                    // Optionally, you can remove the local Docker image
+                    sh "docker rmi $dockerImageName"
                 }
             }
         }
+
         stage('logout') {
             steps {
                 sh 'docker logout'
